@@ -1,0 +1,78 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Código QR - Consultorio Médico</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #eef2f7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 24px;
+  }
+  .hoja {
+    background: #fff;
+    padding: 40px 36px;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.10);
+    text-align: center;
+    max-width: 420px;
+    width: 100%;
+  }
+  .hoja h1 {
+    font-size: 20px;
+    color: #1f3a5f;
+    margin-bottom: 6px;
+  }
+  .hoja .sub {
+    font-size: 13px;
+    color: #6b7a90;
+    margin-bottom: 24px;
+  }
+  .hoja img {
+    width: 260px;
+    height: 260px;
+    display: block;
+    margin: 0 auto;
+  }
+  .hoja .link {
+    display: block;
+    margin-top: 20px;
+    font-size: 12px;
+    color: #6b7a90;
+    word-break: break-all;
+    line-height: 1.5;
+  }
+  .hoja .pie {
+    margin-top: 22px;
+    padding-top: 16px;
+    border-top: 1px solid #e3e8ef;
+    font-size: 12px;
+    color: #9aa7b8;
+  }
+  @media print {
+    body { background: #fff; padding: 0; }
+    .hoja {
+      box-shadow: none;
+      border: none;
+      border-radius: 0;
+      max-width: 100%;
+      padding: 20px;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="hoja">
+    <h1>Consultorio Médico</h1>
+    <p class="sub">Escaneá este código para ingresar al sistema</p>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=600x600&data=https://kara-gue.github.io/consultorio-medico-digital/" alt="Código QR">
+    <span class="link">https://kara-gue.github.io/consultorio-medico-digital/</span>
+    <p class="pie">Apuntá la cámara del celular al código</p>
+  </div>
+</body>
+</html>

@@ -1,0 +1,1335 @@
+﻿<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultorio Médico - Sistema Completo</title>
+    <style>
+        :root {
+            --bg-body: #f0f4f8;
+            --bg-contenedor: #ffffff;
+            --text-main: #333333;
+            --text-p: #555555;
+            --h1-color: #0277bd;
+            --input-bg: #ffffff;
+            --input-border: #cfd8dc;
+            --input-text: #333333;
+            --info-bg: #fafafa;
+            --btn-volver-bg: #78909c; /* Más oscuro para modo claro */
+            --btn-volver-hover: #546e7a;
+            --btn-cliente-bg: #01579b; /* Más oscuro y contrastado para modo claro */
+            --btn-cliente-hover: #003c6c;
+            --card-bg: #fafafa;
+            --card-border: #cfd8dc;
+        }
+
+        body.modo-oscuro {
+            --bg-body: #121212;
+            --bg-contenedor: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-p: #b0b0b0;
+            --h1-color: #4fc3f7;
+            --input-bg: #2d2d2d;
+            --input-border: #444444;
+            --input-text: #ffffff;
+            --info-bg: #252525;
+            --btn-volver-bg: #546e7a;
+            --btn-volver-hover: #78909c;
+            --btn-cliente-bg: #0288d1;
+            --btn-cliente-hover: #03a9f4;
+            --card-bg: #2a2a2a;
+            --card-border: #444444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            position: relative;
+        }
+
+        /* Botón de Modo Oscuro / Claro en la esquina superior derecha */
+        .btn-modo-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--bg-contenedor);
+            border: 2px solid var(--h1-color);
+            color: var(--h1-color);
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.2s, background-color 0.3s;
+            z-index: 1000;
+        }
+        .btn-modo-toggle:hover {
+            transform: scale(1.1);
+        }
+        .btn-modo-toggle svg {
+            width: 22px;
+            height: 22px;
+            fill: currentColor;
+        }
+
+        .contenedor {
+            background-color: var(--bg-contenedor);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            max-width: 800px;
+            width: 95%;
+            box-sizing: border-box;
+            max-height: 90vh;
+            overflow-y: auto;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        h1 {
+            color: var(--h1-color);
+            margin-bottom: 10px;
+            font-size: 22px;
+            text-align: center;
+        }
+
+        p {
+            color: var(--text-p);
+            margin-bottom: 20px;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .vista {
+            display: none;
+        }
+        .vista.activa {
+            display: block;
+        }
+
+        .botones {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .btn {
+            padding: 12px;
+            font-size: 15px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            text-align: center;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+
+        .btn-cliente {
+            background-color: var(--btn-cliente-bg);
+            color: white;
+        }
+        .btn-cliente:hover {
+            background-color: var(--btn-cliente-hover);
+        }
+
+        .btn-admin {
+            background-color: var(--input-border);
+            color: var(--text-main);
+            border: 1px solid var(--input-border);
+        }
+        .btn-admin:hover {
+            opacity: 0.85;
+        }
+
+        .btn-volver {
+            background-color: var(--btn-volver-bg);
+            color: white;
+        }
+        .btn-volver:hover {
+            background-color: var(--btn-volver-hover);
+        }
+
+        .btn-secundario {
+            background-color: #c62828;
+            color: white;
+        }
+        .btn-secundario:hover {
+            background-color: #b71c1c;
+        }
+
+        .btn-dia-agenda {
+            background-color: var(--card-bg);
+            color: var(--h1-color);
+            border: 1px solid var(--h1-color);
+            text-align: left;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        .btn-dia-agenda:hover {
+            opacity: 0.9;
+        }
+
+        .grupo-formulario {
+            text-align: left;
+            margin-bottom: 12px;
+        }
+
+        .grupo-formulario label {
+            display: block;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 4px;
+            font-size: 13px;
+        }
+
+        .grupo-formulario input, .grupo-formulario textarea, .grupo-formulario select {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid var(--input-border);
+            background-color: var(--input-bg);
+            color: var(--input-text);
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .grid-fecha-nacimiento {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr 1.2fr;
+            gap: 8px;
+        }
+
+        .mensaje-alerta {
+            color: #d32f2f;
+            font-size: 13px;
+            margin-bottom: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .grid-dos-columnas {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 650px) {
+            .grid-dos-columnas {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .calendario-bloques {
+            border: 1px solid var(--card-border);
+            padding: 10px;
+            border-radius: 8px;
+            background: var(--card-bg);
+            max-height: 350px;
+            overflow-y: auto;
+        }
+
+        .dia-bloque {
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 8px;
+        }
+
+        .dia-titulo {
+            font-weight: bold;
+            color: var(--h1-color);
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .opcion-bloque {
+            font-size: 13px;
+            margin: 3px 0;
+            color: var(--text-main);
+        }
+
+        .bloque-detalle-admin {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: left;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .bloque-titulo-admin {
+            font-weight: bold;
+            color: var(--h1-color);
+            font-size: 15px;
+            border-bottom: 2px solid var(--h1-color);
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+
+        .agenda-card {
+            background: var(--bg-contenedor);
+            border-left: 4px solid var(--h1-color);
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 13px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .config-bloque-row {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        .config-bloque-row h4 {
+            margin: 0 0 8px 0;
+            color: var(--h1-color);
+            font-size: 14px;
+        }
+
+        .info-container {
+            text-align: left;
+            background: var(--info-bg);
+            border: 1px solid var(--card-border);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .info-titulo { color: var(--h1-color); font-size: 18px; font-weight: bold; margin-bottom: 8px; }
+        .info-subtitulo { color: #d32f2f; font-size: 15px; font-weight: bold; margin-top: 12px; margin-bottom: 4px; }
+        .info-texto { color: var(--text-main); font-size: 13px; line-height: 1.4; }
+    </style>
+</head>
+<body>
+
+    <!-- Botón flotante para cambiar Modo Oscuro / Claro -->
+    <button class="btn-modo-toggle" id="btn-modo" onclick="toggleModoOscuro()" title="Cambiar modo oscuro/claro">
+        <!-- Icono Sol por defecto (se cambia dinámicamente) -->
+        <svg id="icono-modo" viewBox="0 0 24 24">
+            <path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
+        </svg>
+    </button>
+
+    <!-- 1. VISTA INICIO -->
+    <div id="vista-inicio" class="contenedor vista activa">
+        <h1>Bienvenido a tu Consultorio Médico Digital</h1>
+        <p>Por favor, selecciona cómo deseas ingresar al sistema:</p>
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="cambiarVista('vista-paciente-menu')">
+                Entrar como Paciente
+            </button>
+            <button class="btn btn-admin" onclick="cambiarVista('vista-admin-login')">
+                Entrar como Administrador
+            </button>
+        </div>
+    </div>
+
+    <!-- 2. VISTA LOGIN ADMINISTRADOR -->
+    <div id="vista-admin-login" class="contenedor vista">
+        <h1>Portal Administrador</h1>
+        <p>Ingresa tus credenciales de acceso:</p>
+        <div class="grupo-formulario">
+            <label for="admin-cedula">Cédula:</label>
+            <input type="text" id="admin-cedula" placeholder="Ej. 11.111.111">
+        </div>
+        <div class="grupo-formulario">
+            <label for="admin-codigo">Código de acceso:</label>
+            <input type="password" id="admin-codigo" placeholder="Ej. 1111CCCC">
+        </div>
+        <div id="admin-error" class="mensaje-alerta">Cédula o código incorrectos.</div>
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="validarAdmin()">Ingresar</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-inicio')">Volver</button>
+        </div>
+    </div>
+
+    <!-- 3. VISTA PANEL ADMINISTRADOR -->
+    <div id="vista-admin-panel" class="contenedor vista">
+        <h1 id="admin-saludo">Panel de Administrador</h1>
+        <p>Selecciona una opción de gestión:</p>
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="cargarAgendaAdmin()">Visualizar Agenda</button>
+            <button class="btn btn-admin" onclick="abrirConfiguracionBloquesSemanal()">Modificar bloque de consulta semanal</button>
+            <button class="btn btn-secundario" onclick="limpiarTodasLasCitas()">🧹 Limpiar todas las citas de prueba</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-inicio')">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <!-- 3.0 VISTA CONFIGURAR BLOQUE SEMANAL -->
+    <div id="vista-admin-config-bloques" class="contenedor vista" style="max-width: 800px;">
+        <h1>Modificar Bloque de Consulta Semanal</h1>
+        <p>Define el tipo de consulta, médico y cupos máximos para cada turno de lunes a viernes:</p>
+        <div id="contenedor-config-bloques" style="max-height: 380px; overflow-y: auto; margin-bottom: 15px;"></div>
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="guardarConfiguracionBloques()">Guardar Cambios</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-admin-panel')">Volver al Panel</button>
+        </div>
+    </div>
+
+    <!-- 3.1 VISTA AGENDA ADMINISTRADOR -->
+    <div id="vista-admin-agenda" class="contenedor vista" style="max-width: 680px;">
+        <h1>Agenda de Pacientes</h1>
+        <p>Seleccione un día para ver los bloques de atención:</p>
+        <div id="contenedor-botones-agenda" style="max-height: 380px; overflow-y: auto; margin-bottom: 15px;"></div>
+        <div class="botones">
+            <button class="btn btn-volver" onclick="cambiarVista('vista-admin-panel')">Volver al Panel</button>
+        </div>
+    </div>
+
+    <!-- 3.2 VISTA DETALLE DE BLOQUES POR DÍA -->
+    <div id="vista-admin-detalledia" class="contenedor vista" style="max-width: 700px;">
+        <h1 id="titulo-dia-seleccionado">Detalle del Día</h1>
+        <p>Pacientes agendados por bloques horarios:</p>
+        
+        <div class="bloque-detalle-admin">
+            <div class="bloque-titulo-admin" id="titulo-bloque-manana">Bloque Mañana</div>
+            <div id="lista-pacientes-manana"></div>
+        </div>
+
+        <div class="bloque-detalle-admin">
+            <div class="bloque-titulo-admin" id="titulo-bloque-tarde">Bloque Tarde</div>
+            <div id="lista-pacientes-tarde"></div>
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-volver" onclick="cambiarVista('vista-admin-agenda')">Volver a la Agenda</button>
+        </div>
+    </div>
+
+    <!-- 4. VISTA MENÚ PACIENTE -->
+    <div id="vista-paciente-menu" class="contenedor vista">
+        <h1>Portal del Paciente</h1>
+        <p>Selecciona la gestión que deseas realizar:</p>
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="prepararFormularioPaciente('registrar')">Registrar Paciente</button>
+            <button class="btn btn-cliente" onclick="prepararFormularioPaciente('modificar')">Modificar o Cancelar Cita</button>
+            <button class="btn btn-cliente" onclick="cambiarVista('vista-paciente-info')">Información General</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-inicio')">Volver</button>
+        </div>
+    </div>
+
+    <!-- 5. VISTA FORMULARIO BÁSICO PACIENTE -->
+    <div id="vista-paciente-form" class="contenedor vista">
+        <h1 id="titulo-form-paciente">Gestión de Paciente</h1>
+        <p id="subtitulo-form-paciente">Completa los datos solicitados:</p>
+        <div class="grupo-formulario">
+            <label for="paciente-cedula">Cédula:</label>
+            <input type="text" id="paciente-cedula" placeholder="Número de cédula">
+        </div>
+        <div class="grupo-formulario">
+            <label for="paciente-telefono">Número de Teléfono:</label>
+            <input type="tel" id="paciente-telefono" placeholder="Número telefónico">
+        </div>
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="avanzarADetallePaciente()">Siguiente</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-paciente-menu')">Volver</button>
+        </div>
+    </div>
+
+    <!-- 6. VISTA DETALLE Y CALENDARIO (REGISTRO) -->
+    <div id="vista-paciente-detalle" class="contenedor vista" style="max-width: 800px;">
+        <h1>Registro y Selección de Horario</h1>
+        <p>Completa tus datos personales y selecciona un bloque disponible:</p>
+        
+        <div class="grid-dos-columnas">
+            <div>
+                <div class="grupo-formulario">
+                    <label for="det-nombres">Nombres y Apellidos:</label>
+                    <input type="text" id="det-nombres" placeholder="Nombres completos">
+                </div>
+                
+                <div class="grupo-formulario">
+                    <label>Fecha de Nacimiento:</label>
+                    <div class="grid-fecha-nacimiento">
+                        <select id="nac-dia" onchange="calcularEdadAutomatica()">
+                            <option value="">Día</option>
+                        </select>
+                        <select id="nac-mes" onchange="calcularEdadAutomatica()">
+                            <option value="">Mes</option>
+                            <option value="1">Enero</option>
+                            <option value="2">Febrero</option>
+                            <option value="3">Marzo</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Mayo</option>
+                            <option value="6">Junio</option>
+                            <option value="7">Julio</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Septiembre</option>
+                            <option value="10">Octubre</option>
+                            <option value="11">Noviembre</option>
+                            <option value="12">Diciembre</option>
+                        </select>
+                        <select id="nac-anio" onchange="calcularEdadAutomatica()">
+                            <option value="">Año</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grupo-formulario">
+                    <label for="det-edad">Edad (Calculada automáticamente):</label>
+                    <input type="text" id="det-edad" readonly style="background-color: var(--card-bg);">
+                </div>
+                <div class="grupo-formulario">
+                    <label for="det-direccion">Dirección de Habitación:</label>
+                    <input type="text" id="det-direccion" placeholder="Dirección completa">
+                </div>
+                <div class="grupo-formulario">
+                    <label for="det-motivo">Motivo de consulta o tratamiento:</label>
+                    <input type="text" id="det-motivo" placeholder="Ej. dolor de cabeza, edema...">
+                </div>
+            </div>
+
+            <div>
+                <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 4px;">Seleccione un bloque disponible:</label>
+                <div id="calendario-bloques-container" class="calendario-bloques"></div>
+            </div>
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="revisarConfirmacionCita()">Confirmar Acción</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-paciente-form')">Volver</button>
+        </div>
+    </div>
+
+    <!-- 6.1 VISTA MODIFICAR CARTILLA DE DATOS (EDICIÓN) -->
+    <div id="vista-paciente-editar-cartilla" class="contenedor vista" style="max-width: 750px;">
+        <h1>Modificar Datos de la Cita</h1>
+        <p>Actualiza la información necesaria y guarda los cambios:</p>
+        
+        <div>
+            <div class="grupo-formulario">
+                <label for="edit-nombres">Nombres y Apellidos:</label>
+                <input type="text" id="edit-nombres" placeholder="Nombres completos">
+            </div>
+            
+            <div class="grupo-formulario">
+                <label>Fecha de Nacimiento:</label>
+                <div class="grid-fecha-nacimiento">
+                    <select id="edit-nac-dia" onchange="calcularEdadEdicion()">
+                        <option value="">Día</option>
+                    </select>
+                    <select id="edit-nac-mes" onchange="calcularEdadEdicion()">
+                        <option value="">Mes</option>
+                        <option value="1">Enero</option>
+                        <option value="2">Febrero</option>
+                        <option value="3">Marzo</option>
+                        <option value="4">Abril</option>
+                        <option value="5">Mayo</option>
+                        <option value="6">Junio</option>
+                        <option value="7">Julio</option>
+                        <option value="8">Agosto</option>
+                        <option value="9">Septiembre</option>
+                        <option value="10">Octubre</option>
+                        <option value="11">Noviembre</option>
+                        <option value="12">Diciembre</option>
+                    </select>
+                    <select id="edit-nac-anio" onchange="calcularEdadEdicion()">
+                        <option value="">Año</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="grupo-formulario">
+                <label for="edit-edad">Edad (Calculada automáticamente):</label>
+                <input type="text" id="edit-edad" readonly style="background-color: var(--card-bg);">
+            </div>
+            <div class="grupo-formulario">
+                <label for="edit-direccion">Dirección de Habitación:</label>
+                <input type="text" id="edit-direccion" placeholder="Dirección completa">
+            </div>
+            <div class="grupo-formulario">
+                <label for="edit-motivo">Motivo de consulta o tratamiento:</label>
+                <input type="text" id="edit-motivo" placeholder="Motivo">
+            </div>
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="guardarEdicionCartilla()">Confirmar Actualización</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-paciente-menu')">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- 6.2 VISTA MODIFICAR HORARIO -->
+    <div id="vista-paciente-editar-horario" class="contenedor vista" style="max-width: 650px;">
+        <h1>Modificar Horario de la Cita</h1>
+        <p>Selecciona un nuevo bloque disponible dentro de los próximos 5 días hábiles:</p>
+        <div id="calendario-bloques-modificar-container" class="calendario-bloques" style="max-height: 350px; margin-bottom: 15px;"></div>
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="guardarEdicionHorario()">Guardar Nuevo Horario</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-paciente-menu')">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- 7. VISTA CONFIRMACIÓN DE CITA (REGISTRO) -->
+    <div id="vista-paciente-confirmacion" class="contenedor vista">
+        <h1>¿Desea confirmar cita?</h1>
+        <p>Por favor revise los datos ingresados:</p>
+        
+        <div id="resumen-datos-cita" style="text-align: left; background: var(--card-bg); border: 1px solid var(--card-border); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; line-height: 1.5;"></div>
+
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="guardarYFinalizarCita()">Sí, confirmar</button>
+            <button class="btn btn-secundario" onclick="cambiarVista('vista-paciente-detalle')">No, regresar</button>
+        </div>
+    </div>
+
+    <!-- 7.1 VISTA VERIFICAR CITA ENCONTRADA (MODIFICAR/CANCELAR) -->
+    <div id="vista-paciente-verificar-encontrada" class="contenedor vista">
+        <h1>¿Esta es tu cita agendada?</h1>
+        <p>Hemos encontrado la siguiente información con tus datos:</p>
+        
+        <div id="resumen-cita-encontrada" style="text-align: left; background: var(--card-bg); border: 1px solid var(--card-border); padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 13px; line-height: 1.5;"></div>
+
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="cambiarVista('vista-paciente-opciones-gestion')">Sí, confirmar</button>
+            <button class="btn btn-secundario" onclick="cambiarVista('vista-paciente-form')">No, regresar</button>
+        </div>
+    </div>
+
+    <!-- 7.2 VISTA OPCIONES DE GESTIÓN DE CITA ENCONTRADA -->
+    <div id="vista-paciente-opciones-gestion" class="contenedor vista">
+        <h1>Gestión de su Cita</h1>
+        <p>¿Qué acción desea realizar con su cita?</p>
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="accionMantenerCita()">¿Desea mantener la cita?</button>
+            <button class="btn btn-admin" onclick="mostrarOpcionesModificarCita()">¿Desea modificar cita?</button>
+            <button class="btn btn-secundario" onclick="mostrarConfirmacionEliminarCita()">¿Desea eliminar la cita?</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-inicio')">Volver al Inicio</button>
+        </div>
+    </div>
+
+    <!-- 7.3 VISTA SUBOPCIONES MODIFICAR CITA -->
+    <div id="vista-paciente-subopciones-modificar" class="contenedor vista">
+        <h1>Modificar Cita</h1>
+        <p>Seleccione el aspecto que desea actualizar:</p>
+        <div class="botones">
+            <button class="btn btn-cliente" onclick="prepararEdicionHorario()">¿Desea modificar el horario de cita?</button>
+            <button class="btn btn-cliente" onclick="prepararEdicionCartilla()">¿Desea modificar la cartilla de datos?</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-paciente-opciones-gestion')">Volver</button>
+        </div>
+    </div>
+
+    <!-- 7.4 VISTA CONFIRMACIÓN ELIMINAR CITA -->
+    <div id="vista-paciente-confirmar-eliminar" class="contenedor vista" style="text-align: center;">
+        <h1 style="color: #d32f2f;">¿Quiere realmente eliminar su cita?</h1>
+        <p>Esta acción liberará su cupo y borrará su registro de la agenda.</p>
+        <div class="botones">
+            <button class="btn btn-secundario" onclick="ejecutarEliminacionCita()">Sí, eliminar</button>
+            <button class="btn btn-volver" onclick="cambiarVista('vista-inicio')">No eliminar</button>
+        </div>
+    </div>
+
+    <!-- 8. VISTA ÉXITO CITA AGENDADA / ACTUALIZADA -->
+    <div id="vista-paciente-exito" class="contenedor vista" style="text-align: center;">
+        <h1 style="color: #2e7d32; font-size: 26px;" id="titulo-exito-texto">¡Su cita ha sido agendada!</h1>
+        <p style="font-size: 15px; margin-top: 15px; color: var(--text-p);">Redirigiendo al inicio en <span id="contador-regresivo" style="font-weight: bold; color: var(--h1-color);">8</span> segundos...</p>
+        <div class="botones" style="margin-top: 20px;">
+            <button class="btn btn-volver" onclick="cambiarVista('vista-inicio')">Volver al Inicio Ahora</button>
+        </div>
+    </div>
+
+    <!-- 8.1 VISTA GRACIAS POR ELEGIRNOS (MANTENER CITA) -->
+    <div id="vista-paciente-gracias" class="contenedor vista" style="text-align: center;">
+        <h1 style="color: #2e7d32; font-size: 26px;">¡Gracias por elegirnos!</h1>
+        <p style="font-size: 15px; margin-top: 15px; color: var(--text-p);">Nos alegra contar con su confianza.</p>
+        <div class="botones" style="margin-top: 25px;">
+            <button class="btn btn-cliente" onclick="cambiarVista('vista-inicio')">Volver al Inicio</button>
+        </div>
+    </div>
+
+    <!-- 9. VISTA INFORMACIÓN GENERAL -->
+    <div id="vista-paciente-info" class="contenedor vista" style="max-width: 800px;">
+        <h1 style="color: var(--h1-color);">Información General</h1>
+        <p>Conoce los detalles de nuestro consultorio médico digital:</p>
+        
+        <div class="info-container" contenteditable="true">
+            <div class="info-titulo">Consultorio Medico Digital</div>
+            <div class="info-texto">Les damos la bienvenida a todos nuestros pacientes para que agenden con confianza su cita previa con este nuevo sistema de consultorio digital.</div>
+            
+            <div class="info-subtitulo">Horarios de Atención</div>
+            <div class="info-texto">Lunes a Viernes: 7:00 AM - 7:00 PM. Dos turnos, mañana y tarde.</div>
+
+            <div class="info-subtitulo">Especialidades Disponibles</div>
+            <div class="info-texto">Cirugía Cardiovascular, Medicina Internista, Ecografía Vascular, Estudios de presión Arterial (MAPA) y LASER Vascular.</div>
+
+            <div class="info-subtitulo">Requisitos para las Consultas</div>
+            <div class="info-texto">Presentar cédula de identidad, llegar 10 minutos antes y traer reportes médicos previos si aplica.</div>
+
+            <div class="info-subtitulo">COSTOS DE LOS SERVICIOS</div>
+            <div class="info-texto">Consultas, Estudios de Ecografía, MAPA y LASER: 100.000 Pesos (cada uno).</div>
+        </div>
+
+        <div class="botones">
+            <button class="btn btn-volver" onclick="cambiarVista('vista-paciente-menu')">Volver al Menú</button>
+        </div>
+    </div>
+
+    <!-- Lógica en JavaScript -->
+    <script>
+        let pacienteActual = {
+            cedula: "",
+            telefono: "",
+            fechaHoy: "",
+            nombres: "",
+            fechaNacimiento: "",
+            edad: "",
+            direccion: "",
+            motivo: "",
+            fechaSeleccionada: "",
+            bloqueSeleccionado: ""
+        };
+
+        let modoFormularioPaciente = 'registrar';
+        let temporizadorRedireccion = null;
+
+        // Gestión de Modo Oscuro / Claro
+        function toggleModoOscuro() {
+            const body = document.body;
+            body.classList.toggle('modo-oscuro');
+            const esOscuro = body.classList.contains('modo-oscuro');
+            localStorage.setItem('modo_oscuro_activado', esOscuro ? '1' : '0');
+            actualizarIconoModo(esOscuro);
+        }
+
+        function actualizarIconoModo(esOscuro) {
+            const icono = document.getElementById('icono-modo');
+            if (esOscuro) {
+                // Icono Luna
+                icono.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+            } else {
+                // Icono Sol
+                icono.innerHTML = '<path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>';
+            }
+        }
+
+        function obtenerFechaDispositivoIso() {
+            const hoy = new Date();
+            const anio = hoy.getFullYear();
+            const mes = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dia = String(hoy.getDate()).padStart(2, '0');
+            return `${anio}-${mes}-${dia}`;
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // Cargar preferencia de modo oscuro guardada
+            if(localStorage.getItem('modo_oscuro_activado') === '1') {
+                document.body.classList.add('modo-oscuro');
+                actualizarIconoModo(true);
+            }
+
+            const fechaDispositivo = obtenerFechaDispositivoIso();
+            localStorage.setItem('sistema_fecha_hoy', fechaDispositivo);
+
+            const anioActual = new Date().getFullYear();
+
+            const selectDia = document.getElementById('nac-dia');
+            const selectDiaEdit = document.getElementById('edit-nac-dia');
+            for (let d = 1; d <= 31; d++) {
+                let opt = document.createElement('option'); opt.value = d; opt.text = d; selectDia.appendChild(opt);
+                let opt2 = document.createElement('option'); opt2.value = d; opt2.text = d; selectDiaEdit.appendChild(opt2);
+            }
+
+            const selectAnio = document.getElementById('nac-anio');
+            const selectAnioEdit = document.getElementById('edit-nac-anio');
+            for (let a = anioActual; a >= anioActual - 120; a--) {
+                let opt = document.createElement('option'); opt.value = a; opt.text = a; selectAnio.appendChild(opt);
+                let opt2 = document.createElement('option'); opt2.value = a; opt2.text = a; selectAnioEdit.appendChild(opt2);
+            }
+        });
+
+        function cambiarVista(idVista) {
+            if(idVista !== 'vista-paciente-exito' && temporizadorRedireccion) {
+                clearInterval(temporizadorRedireccion);
+            }
+
+            const vistas = document.querySelectorAll('.vista');
+            vistas.forEach(v => v.classList.remove('activa'));
+            document.getElementById(idVista).classList.add('activa');
+
+            if(idVista === 'vista-admin-login') {
+                document.getElementById('admin-cedula').value = '';
+                document.getElementById('admin-codigo').value = '';
+                document.getElementById('admin-error').style.display = 'none';
+            }
+        }
+
+        function validarAdmin() {
+            const cedula = document.getElementById('admin-cedula').value.trim();
+            const codigo = document.getElementById('admin-codigo').value.trim();
+            const errorDiv = document.getElementById('admin-error');
+
+            const adminsValidos = [
+                { cedula: "12.345.678", codigo: "jose1968", nombre: "¡Bienvenido, José!" },
+                { cedula: "87.654.321", codigo: "asistonto", nombre: "¡Bienvenido, asistente!" }
+            ];
+
+            const encontrado = adminsValidos.find(admin => admin.cedula === cedula && admin.codigo === codigo);
+
+            if (encontrado) {
+                errorDiv.style.display = 'none';
+                document.getElementById('admin-saludo').innerText = encontrado.nombre;
+                localStorage.setItem('admin_fecha_hoy', obtenerFechaDispositivoIso());
+                cambiarVista('vista-admin-panel');
+            } else {
+                errorDiv.innerText = "Cédula o código incorrectos.";
+                errorDiv.style.display = 'block';
+            }
+        }
+
+        function limpiarTodasLasCitas() {
+            if(confirm("¿Estás seguro de que deseas eliminar todas las citas de prueba y reiniciar la agenda?")) {
+                localStorage.removeItem('citas_consultorio');
+                alert("¡Todas las citas han sido borradas con éxito!");
+            }
+        }
+
+        function abrirConfiguracionBloquesSemanal() {
+            const container = document.getElementById('contenedor-config-bloques');
+            container.innerHTML = '';
+
+            const diasSemana = [
+                { nombre: "Lunes", key: "Lunes" },
+                { nombre: "Martes", key: "Martes" },
+                { nombre: "Miércoles", key: "Miercoles" },
+                { nombre: "Jueves", key: "Jueves" },
+                { nombre: "Viernes", key: "Viernes" }
+            ];
+
+            let bloquesConfig = JSON.parse(localStorage.getItem('config_bloques_semanales')) || {};
+
+            diasSemana.forEach(dia => {
+                let confManana = bloquesConfig[dia.key + '_Manana'] || { tipo: "Consulta General", medico: "Dr. por asignar", cupos: 10 };
+                let confTarde = bloquesConfig[dia.key + '_Tarde'] || { tipo: "Consulta General", medico: "Dr. por asignar", cupos: 10 };
+
+                let div = document.createElement('div');
+                div.className = 'config-bloque-row';
+                div.innerHTML = `
+                    <h4>📅 ${dia.nombre}</h4>
+                    <div style="margin-bottom: 8px;">
+                        <span style="font-size: 12px; font-weight: bold; color: var(--h1-color);">Bloque Mañana (7:00 a.m - 12:00 m)</span>
+                        <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 8px; margin-top: 4px;">
+                            <input type="text" id="cfg_${dia.key}_Manana_tipo" placeholder="Tipo de consulta" value="${confManana.tipo}">
+                            <input type="text" id="cfg_${dia.key}_Manana_med" placeholder="Médico encargado" value="${confManana.medico}">
+                            <input type="number" id="cfg_${dia.key}_Manana_cupos" placeholder="Cupos" min="1" value="${confManana.cupos !== undefined ? confManana.cupos : 10}">
+                        </div>
+                    </div>
+                    <div>
+                        <span style="font-size: 12px; font-weight: bold; color: var(--h1-color);">Bloque Tarde (2:00 p.m - 7:00 p.m)</span>
+                        <div style="display: grid; grid-template-columns: 2fr 2fr 1fr; gap: 8px; margin-top: 4px;">
+                            <input type="text" id="cfg_${dia.key}_Tarde_tipo" placeholder="Tipo de consulta" value="${confTarde.tipo}">
+                            <input type="text" id="cfg_${dia.key}_Tarde_med" placeholder="Médico encargado" value="${confTarde.medico}">
+                            <input type="number" id="cfg_${dia.key}_Tarde_cupos" placeholder="Cupos" min="1" value="${confTarde.cupos !== undefined ? confTarde.cupos : 10}">
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+
+            cambiarVista('vista-admin-config-bloques');
+        }
+
+        function guardarConfiguracionBloques() {
+            const diasSemana = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes"];
+            let nuevosConfig = {};
+
+            diasSemana.forEach(dia => {
+                nuevosConfig[dia + '_Manana'] = {
+                    tipo: document.getElementById(`cfg_${dia}_Manana_tipo`).value.trim() || "Consulta General",
+                    medico: document.getElementById(`cfg_${dia}_Manana_med`).value.trim() || "Por asignar",
+                    cupos: parseInt(document.getElementById(`cfg_${dia}_Manana_cupos`).value) || 10
+                };
+                nuevosConfig[dia + '_Tarde'] = {
+                    tipo: document.getElementById(`cfg_${dia}_Tarde_tipo`).value.trim() || "Consulta General",
+                    medico: document.getElementById(`cfg_${dia}_Tarde_med`).value.trim() || "Por asignar",
+                    cupos: parseInt(document.getElementById(`cfg_${dia}_Tarde_cupos`).value) || 10
+                };
+            });
+
+            localStorage.setItem('config_bloques_semanales', JSON.stringify(nuevosConfig));
+            alert("¡Bloques y cupos semanales actualizados con éxito!");
+            cambiarVista('vista-admin-panel');
+        }
+
+        function prepararFormularioPaciente(tipo) {
+            modoFormularioPaciente = tipo;
+            const titulo = document.getElementById('titulo-form-paciente');
+            const subtitulo = document.getElementById('subtitulo-form-paciente');
+            
+            document.getElementById('paciente-cedula').value = '';
+            document.getElementById('paciente-telefono').value = '';
+
+            if (tipo === 'registrar') {
+                titulo.innerText = "Registrar Paciente";
+                subtitulo.innerText = "Ingresa tus datos:";
+            } else if (tipo === 'modificar') {
+                titulo.innerText = "Modificar o Cancelar Cita";
+                subtitulo.innerText = "Ingresa tus datos para buscar tu cita:";
+            }
+
+            cambiarVista('vista-paciente-form');
+        }
+
+        function avanzarADetallePaciente() {
+            const cedula = document.getElementById('paciente-cedula').value.trim();
+            const telefono = document.getElementById('paciente-telefono').value.trim();
+            const fechaHoy = obtenerFechaDispositivoIso();
+
+            if(!cedula || !telefono) {
+                alert("Por favor completa la cédula y el teléfono.");
+                return;
+            }
+
+            let citasRegistradas = JSON.parse(localStorage.getItem('citas_consultorio')) || [];
+            let citaEncontrada = citasRegistradas.find(c => c.cedula === cedula);
+
+            if (modoFormularioPaciente === 'registrar') {
+                if(citaEncontrada) {
+                    alert("Ya existe una cita registrada con esta cédula.");
+                    return;
+                }
+                pacienteActual.cedula = cedula;
+                pacienteActual.telefono = telefono;
+                pacienteActual.fechaHoy = fechaHoy;
+
+                document.getElementById('det-nombres').value = '';
+                document.getElementById('nac-dia').value = '';
+                document.getElementById('nac-mes').value = '';
+                document.getElementById('nac-anio').value = '';
+                document.getElementById('det-edad').value = '';
+                document.getElementById('det-direccion').value = '';
+                document.getElementById('det-motivo').value = '';
+
+                generarCalendarioBloques(fechaHoy, 'calendario-bloques-container');
+                cambiarVista('vista-paciente-detalle');
+            } else {
+                if(!citaEncontrada) {
+                    alert("No se encontró ninguna cita registrada con esta cédula.");
+                    return;
+                }
+                pacienteActual = { ...citaEncontrada };
+
+                const resumenVerificar = document.getElementById('resumen-cita-encontrada');
+                resumenVerificar.innerHTML = `
+                    <b>Nombres y Apellidos:</b> ${pacienteActual.nombres}<br>
+                    <b>Cédula:</b> ${pacienteActual.cedula}<br>
+                    <b>Teléfono:</b> ${pacienteActual.telefono}<br>
+                    <b>Fecha de Nacimiento:</b> ${pacienteActual.fechaNacimiento} (${pacienteActual.edad})<br>
+                    <b>Dirección:</b> ${pacienteActual.direccion}<br>
+                    <b>Motivo de consulta:</b> ${pacienteActual.motivo}<br>
+                    <b>Día y Bloque de la Cita:</b> ${pacienteActual.fechaCita} (${pacienteActual.bloque})
+                `;
+                cambiarVista('vista-paciente-verificar-encontrada');
+            }
+        }
+
+        function generarCalendarioBloques(fechaInicioStr, containerId) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            let diasGenerados = 0;
+            let current = new Date(fechaInicioStr + 'T00:00:00');
+            current.setDate(current.getDate() + 1);
+
+            let citasRegistradas = JSON.parse(localStorage.getItem('citas_consultorio')) || [];
+            let bloquesConfig = JSON.parse(localStorage.getItem('config_bloques_semanales')) || {};
+
+            const mapNombresDias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+
+            while (diasGenerados < 5) {
+                let dayOfWeek = current.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    let fechaIso = current.toISOString().split('T')[0];
+                    let nombreDiaStr = mapNombresDias[dayOfWeek];
+                    let fechaFormateada = current.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' });
+
+                    let confManana = bloquesConfig[nombreDiaStr + '_Manana'] || { tipo: "Consulta General", medico: "Dr. por asignar", cupos: 10 };
+                    let confTarde = bloquesConfig[nombreDiaStr + '_Tarde'] || { tipo: "Consulta General", medico: "Dr. por asignar", cupos: 10 };
+
+                    let maxManana = confManana.cupos !== undefined ? confManana.cupos : 10;
+                    let maxTarde = confTarde.cupos !== undefined ? confTarde.cupos : 10;
+
+                    let ocupadosManana = citasRegistradas.filter(c => c.fechaCita === fechaIso && c.bloque === 'Mañana' && c.cedula !== pacienteActual.cedula).length;
+                    let ocupadosTarde = citasRegistradas.filter(c => c.fechaCita === fechaIso && c.bloque === 'Tarde' && c.cedula !== pacienteActual.cedula).length;
+
+                    let isCheckedManana = (pacienteActual.fechaCita === fechaIso && pacienteActual.bloque === 'Mañana') ? 'checked' : '';
+                    let isCheckedTarde = (pacienteActual.fechaCita === fechaIso && pacienteActual.bloque === 'Tarde') ? 'checked' : '';
+
+                    let divDia = document.createElement('div');
+                    divDia.className = 'dia-bloque';
+                    divDia.innerHTML = `
+                        <div class="dia-titulo">${fechaFormateada}</div>
+                        <div class="opcion-bloque">
+                            <label>
+                                <input type="radio" name="bloque_cita" value="${fechaIso}|Mañana" ${isCheckedManana} ${ocupadosManana >= maxManana ? 'disabled' : ''}> 
+                                <b>Mañana (7am-12m):</b> ${confManana.tipo} (${confManana.medico}) ${ocupadosManana >= maxManana ? `<span style="color:red; font-weight:bold;">(Lleno ${ocupadosManana}/${maxManana})</span>` : `(${maxManana - ocupadosManana} cupos libres)`}
+                            </label>
+                        </div>
+                        <div class="opcion-bloque">
+                            <label>
+                                <input type="radio" name="bloque_cita" value="${fechaIso}|Tarde" ${isCheckedTarde} ${ocupadosTarde >= maxTarde ? 'disabled' : ''}> 
+                                <b>Tarde (2pm-7pm):</b> ${confTarde.tipo} (${confTarde.medico}) ${ocupadosTarde >= maxTarde ? `<span style="color:red; font-weight:bold;">(Lleno ${ocupadosTarde}/${maxTarde})</span>` : `(${maxTarde - ocupadosTarde} cupos libres)`}
+                            </label>
+                        </div>
+                    `;
+                    container.appendChild(divDia);
+                    diasGenerados++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+        }
+
+        function calcularEdadAutomatica() {
+            const d = document.getElementById('nac-dia').value;
+            const m = document.getElementById('nac-mes').value;
+            const a = document.getElementById('nac-anio').value;
+
+            if(!d || !m || !a) return;
+
+            let fechaNacStr = `${a}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            let fechaNac = new Date(fechaNacStr + 'T00:00:00');
+            let fechaHoy = new Date(pacienteActual.fechaHoy + 'T00:00:00');
+
+            let edad = fechaHoy.getFullYear() - fechaNac.getFullYear();
+            let mesDiff = fechaHoy.getMonth() - fechaNac.getMonth();
+            if (mesDiff < 0 || (mesDiff === 0 && fechaHoy.getDate() < fechaNac.getDate())) {
+                edad--;
+            }
+
+            if (edad < 0) edad = 0;
+            document.getElementById('det-edad').value = edad + " años";
+            pacienteActual.edad = edad + " años";
+            pacienteActual.fechaNacimiento = fechaNacStr;
+        }
+
+        function calcularEdadEdicion() {
+            const d = document.getElementById('edit-nac-dia').value;
+            const m = document.getElementById('edit-nac-mes').value;
+            const a = document.getElementById('edit-nac-anio').value;
+
+            if(!d || !m || !a) return;
+
+            let fechaNacStr = `${a}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            let fechaNac = new Date(fechaNacStr + 'T00:00:00');
+            let fechaHoy = new Date(obtenerFechaDispositivoIso() + 'T00:00:00');
+
+            let edad = fechaHoy.getFullYear() - fechaNac.getFullYear();
+            let mesDiff = fechaHoy.getMonth() - fechaNac.getMonth();
+            if (mesDiff < 0 || (mesDiff === 0 && fechaHoy.getDate() < fechaNac.getDate())) {
+                edad--;
+            }
+
+            if (edad < 0) edad = 0;
+            document.getElementById('edit-edad').value = edad + " años";
+            pacienteActual.edad = edad + " años";
+            pacienteActual.fechaNacimiento = fechaNacStr;
+        }
+
+        function revisarConfirmacionCita() {
+            const nombres = document.getElementById('det-nombres').value.trim();
+            const d = document.getElementById('nac-dia').value;
+            const m = document.getElementById('nac-mes').value;
+            const a = document.getElementById('nac-anio').value;
+            const direccion = document.getElementById('det-direccion').value.trim();
+            const edad = document.getElementById('det-edad').value;
+            const motivo = document.getElementById('det-motivo').value.trim();
+            
+            const radioSeleccionado = document.querySelector('input[name="bloque_cita"]:checked');
+
+            if(!nombres || !d || !m || !a || !direccion || !motivo) {
+                alert("Por favor completa todos los campos de la tabla, incluyendo la fecha de nacimiento.");
+                return;
+            }
+
+            if(!radioSeleccionado) {
+                alert("Por favor selecciona un bloque en el calendario.");
+                return;
+            }
+
+            let [fechaCita, bloque] = radioSeleccionado.value.split('|');
+
+            let current = new Date(fechaCita + 'T00:00:00');
+            const mapNombresDias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+            let nombreDiaStr = mapNombresDias[current.getDay()];
+            let bloquesConfig = JSON.parse(localStorage.getItem('config_bloques_semanales')) || {};
+            let confTurno = bloquesConfig[nombreDiaStr + '_' + (bloque === 'Mañana' ? 'Manana' : 'Tarde')] || { cupos: 10 };
+            let maxCupos = confTurno.cupos !== undefined ? confTurno.cupos : 10;
+
+            let citasRegistradas = JSON.parse(localStorage.getItem('citas_consultorio')) || [];
+            let ocupados = citasRegistradas.filter(c => c.fechaCita === fechaCita && c.bloque === bloque).length;
+            if (ocupados >= maxCupos) {
+                alert(`Lo sentimos, este bloque acaba de llenarse (${ocupados}/${maxCupos} cupos). Por favor seleccione otro.`);
+                return;
+            }
+
+            pacienteActual.nombres = nombres;
+            pacienteActual.edad = edad;
+            pacienteActual.direccion = direccion;
+            pacienteActual.motivo = motivo;
+            pacienteActual.fechaCita = fechaCita;
+            pacienteActual.bloque = bloque;
+
+            const resumenDiv = document.getElementById('resumen-datos-cita');
+            resumenDiv.innerHTML = `
+                <b>Nombres y Apellidos:</b> ${nombres}<br>
+                <b>Cédula:</b> ${pacienteActual.cedula}<br>
+                <b>Teléfono:</b> ${pacienteActual.telefono}<br>
+                <b>Fecha de Nacimiento:</b> ${d}/${m}/${a} (${edad})<br>
+                <b>Dirección:</b> ${direccion}<br>
+                <b>Motivo de consulta:</b> ${motivo}<br>
+                <b>Fecha de Cita Seleccionada:</b> ${fechaCita} (${bloque})
+            `;
+
+            cambiarVista('vista-paciente-confirmacion');
+        }
+
+        function guardarYFinalizarCita() {
+            let citasRegistradas = JSON.parse(localStorage.getItem('citas_consultorio')) || [];
+            
+            citasRegistradas = citasRegistradas.filter(c => c.cedula !== pacienteActual.cedula);
+            citasRegistradas.push({ ...pacienteActual });
+            localStorage.setItem('citas_consultorio', JSON.stringify(citasRegistradas));
+
+            document.getElementById('titulo-exito-texto').innerText = "¡Su cita ha sido agendada!";
+            cambiarVista('vista-paciente-exito');
+
+            iniciarCuentaRegresivaExito();
+        }
+
+        function iniciarCuentaRegresivaExito() {
+            let segundosRestantes = 8;
+            const spanContador = document.getElementById('contador-regresivo');
+            spanContador.innerText = segundosRestantes;
+
+            if (temporizadorRedireccion) clearInterval(temporizadorRedireccion);
+
+            temporizadorRedireccion = setInterval(() => {
+                segundosRestantes--;
+                spanContador.innerText = segundosRestantes;
+                if (segundosRestantes <= 0) {
+                    clearInterval(temporizadorRedireccion);
+                    cambiarVista('vista-inicio');
+                }
+            }, 1000);
+        }
+
+        function accionMantenerCita() {
+            cambiarVista('vista-paciente-gracias');
+        }
+
+        function mostrarOpcionesModificarCita() {
+            cambiarVista('vista-paciente-subopciones-modificar');
+        }
+
+        function mostrarConfirmacionEliminarCita() {
+            cambiarVista('vista-paciente-confirmar-eliminar');
+        }
+
+        function ejecutarEliminacionCita() {
+            let citasRegistradas = JSON.parse(localStorage.getItem('citas_consultorio')) || [];
+            citasRegistradas = citasRegistradas.filter(c => c.cedula !== pacienteActual.cedula);
+            localStorage.setItem('citas_consultorio', JSON.stringify(citasRegistradas));
+            alert("Su cita ha sido eliminada exitosamente y el cupo ha quedado disponible.");
+            cambiarVista('vista-inicio');
+        }
+
+        function prepararEdicionHorario() {
+            generarCalendarioBloques(obtenerFechaDispositivoIso(), 'calendario-bloques-modificar-container');
+            cambiarVista('vista-paciente-editar-horario');
+        }
+
+        function guardarEdicionHorario() {
+            const radioSeleccionado = document.querySelector('#calendario-bloques-modificar-container input[name="bloque_cita"]:checked');
+            if(!radioSeleccionado) {
+                alert("Por favor seleccione un nuevo bloque horario.");
+                return;
+            }
+            let [fechaCita, bloque] = radioSeleccionado.value.split('|');
+
+            pacienteActual.fechaCita = fechaCita;
+            pacienteActual.bloque = bloque;
+
+            let citasRegistradas = JSON.parse(localStorage.getItem('citas_consultorio')) || [];
+            citasRegistradas = citasRegistradas.filter(c => c.cedula !== pacienteActual.cedula);
+            citasRegistradas.push({ ...pacienteActual });
+            localStorage.setItem('citas_consultorio', JSON.stringify(citasRegistradas));
+
+            document.getElementById('titulo-exito-texto').innerText = "¡Gracias por elegirnos!";
+            cambiarVista('vista-paciente-exito');
+            iniciarCuentaRegresivaExito();
+        }
+
+        function prepararEdicionCartilla() {
+            document.getElementById('edit-nombres').value = pacienteActual.nombres;
+            document.getElementById('edit-direccion').value = pacienteActual.direccion;
+            document.getElementById('edit-motivo').value = pacienteActual.motivo;
+            document.getElementById('edit-edad').value = pacienteActual.edad;
+
+            if(pacienteActual.fechaNacimiento) {
+                let partes = pacienteActual.fechaNacimiento.split('-');
+                if(partes.length === 3) {
+                    document.getElementById('edit-nac-anio').value = partes[0];
+                    document.getElementById('edit-nac-mes').value = parseInt(partes[1], 10);
+                    document.getElementById('edit-nac-dia').value = parseInt(partes[2], 10);
+                }
+            }
+
+            cambiarVista('vista-paciente-editar-cartilla');
+        }
+
+        function guardarEdicionCartilla() {
+            const nombres = document.getElementById('edit-nombres').value.trim();
+            const d = document.getElementById('edit-nac-dia').value;
+            const m = document.getElementById('edit-nac-mes').value;
+            const a = document.getElementById('edit-nac-anio').value;
+            const direccion = document.getElementById('edit-direccion').value.trim();
+            const edad = document.getElementById('edit-edad').value;
+            const motivo = document.getElementById('edit-motivo').value.trim();
+
+            if(!nombres || !d || !m || !a || !direccion || !motivo) {
+                alert("Por favor completa todos los campos de la cartilla.");
+                return;
+            }
+
+            pacienteActual.nombres = nombres;
+            pacienteActual.direccion = direccion;
+            pacienteActual.motivo = motivo;
+            pacienteActual.edad = edad;
+            pacienteActual.fechaNacimiento = `${a}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+
+            let citasRegistradas = JSON.parse(localStorage.getItem('citas_consultorio')) || [];
+            citasRegistradas = citasRegistradas.filter(c => c.cedula !== pacienteActual.cedula);
+            citasRegistradas.push({ ...pacienteActual });
+            localStorage.setItem('citas_consultorio', JSON.stringify(citasRegistradas));
+
+            document.getElementById('titulo-exito-texto').innerText = "¡Gracias por elegirnos!";
+            cambiarVista('vista-paciente-exito');
+            iniciarCuentaRegresivaExito();
+        }
+
+        function cargarAgendaAdmin() {
+            const fechaBaseStr = obtenerFechaDispositivoIso();
+            const container = document.getElementById('contenedor-botones-agenda');
+            container.innerHTML = '';
+
+            let citasRegistradas = JSON.parse(localStorage.getItem('citas_consultorio')) || [];
+
+            let diasGenerados = 0;
+            let current = new Date(fechaBaseStr + 'T00:00:00');
+            current.setDate(current.getDate() + 1);
+
+            while (diasGenerados < 5) {
+                let dayOfWeek = current.getDay();
+                if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    let fechaIso = current.toISOString().split('T')[0];
+                    let fechaFormateada = current.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: '2-digit', day: '2-digit' });
+
+                    let mananaCount = citasRegistradas.filter(c => c.fechaCita === fechaIso && c.bloque === 'Mañana').length;
+                    let tardeCount = citasRegistradas.filter(c => c.fechaCita === fechaIso && c.bloque === 'Tarde').length;
+                    let totalCount = mananaCount + tardeCount;
+
+                    let btnDia = document.createElement('button');
+                    btnDia.className = 'btn-dia-agenda';
+                    btnDia.innerHTML = `
+                        <span>📅 ${fechaFormateada} (${fechaIso})</span>
+                        <span style="background: var(--h1-color); color: white; padding: 3px 8px; border-radius: 12px; font-size: 12px;">${totalCount} pacientes</span>
+                    `;
+                    btnDia.onclick = () => abrirDetalleDiaAdmin(fechaIso, fechaFormateada);
+
+                    container.appendChild(btnDia);
+                    diasGenerados++;
+                }
+                current.setDate(current.getDate() + 1);
+            }
+
+            cambiarVista('vista-admin-agenda');
+        }
+
+        function abrirDetalleDiaAdmin(fechaIso, fechaFormateada) {
+            document.getElementById('titulo-dia-seleccionado').innerText = `Agenda: ${fechaFormateada}`;
+
+            let citasRegistradas = JSON.parse(localStorage.getItem('citas_consultorio')) || [];
+            let bloquesConfig = JSON.parse(localStorage.getItem('config_bloques_semanales')) || {};
+
+            let current = new Date(fechaIso + 'T00:00:00');
+            const mapNombresDias = ['Domingo', 'Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado'];
+            let nombreDiaStr = mapNombresDias[current.getDay()];
+
+            let confManana = bloquesConfig[nombreDiaStr + '_Manana'] || { tipo: "Consulta General", medico: "Por asignar", cupos: 10 };
+            let confTarde = bloquesConfig[nombreDiaStr + '_Tarde'] || { tipo: "Consulta General", medico: "Por asignar", cupos: 10 };
+
+            let maxManana = confManana.cupos !== undefined ? confManana.cupos : 10;
+            let maxTarde = confTarde.cupos !== undefined ? confTarde.cupos : 10;
+
+            let citasManana = citasRegistradas.filter(c => c.fechaCita === fechaIso && c.bloque === 'Mañana');
+            document.getElementById('titulo-bloque-manana').innerText = `Mañana: ${confManana.tipo} (${confManana.medico}) - ${citasManana.length}/${maxManana} pacientes`;
+            
+            let containerManana = document.getElementById('lista-pacientes-manana');
+            containerManana.innerHTML = '';
+            if(citasManana.length === 0) {
+                containerManana.innerHTML = `<div style="font-size:12px; color:var(--text-p);">No hay pacientes agendados en este bloque.</div>`;
+            } else {
+                citasManana.forEach((p, idx) => {
+                    containerManana.innerHTML += `
+                        <div class="agenda-card">
+                            <b>#${idx+1} - ${p.nombres}</b><br>
+                            Cédula: ${p.cedula} | Teléfono: ${p.telefono} | Edad: ${p.edad}<br>
+                            Dirección: ${p.direccion}<br>
+                            Motivo: ${p.motivo}
+                        </div>
+                    `;
+                });
+            }
+
+            let citasTarde = citasRegistradas.filter(c => c.fechaCita === fechaIso && c.bloque === 'Tarde');
+            document.getElementById('titulo-bloque-tarde').innerText = `Tarde: ${confTarde.tipo} (${confTarde.medico}) - ${citasTarde.length}/${maxTarde} pacientes`;
+            
+            let containerTarde = document.getElementById('lista-pacientes-tarde');
+            containerTarde.innerHTML = '';
+            if(citasTarde.length === 0) {
+                containerTarde.innerHTML = `<div style="font-size:12px; color:var(--text-p);">No hay pacientes agendados en este bloque.</div>`;
+            } else {
+                citasTarde.forEach((p, idx) => {
+                    containerTarde.innerHTML += `
+                        <div class="agenda-card">
+                            <b>#${idx+1} - ${p.nombres}</b><br>
+                            Cédula: ${p.cedula} | Teléfono: ${p.telefono} | Edad: ${p.edad}<br>
+                            Dirección: ${p.direccion}<br>
+                            Motivo: ${p.motivo}
+                        </div>
+                    `;
+                });
+            }
+
+            cambiarVista('vista-admin-detalledia');
+        }
+    </script>
+
+</body>
+</html>
